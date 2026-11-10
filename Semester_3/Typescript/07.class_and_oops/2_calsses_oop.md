@@ -557,9 +557,9 @@ The `User` class must provide everything required by `Identifiable`.
 
 ## Why Use an Interface?
 
-An interface describes **what an object should provide** without deciding how it should implement that behavior.
+An interface describes **what a class should provide** without defining how it should implement that behavior.
 
-Different classes can implement the same interface:
+The main purpose of an interface is to define a **common contract** that can be followed by different, potentially unrelated classes.
 
 ```ts
 interface Payable {
@@ -579,7 +579,7 @@ class UpiPayment implements Payable {
 }
 ```
 
-Both classes satisfy the same contract:
+Both classes follow the same contract:
 
 ```text
 Payable
@@ -589,7 +589,27 @@ Payable
 CardPayment   UpiPayment
 ```
 
-A class can also implement multiple interfaces:
+The interface does not provide the implementation of `pay()`.
+Each class decides how to implement it.
+
+---
+
+## Interface vs Abstract Class
+
+The main difference is:
+
+- **Interface** → defines a contract.
+- **Abstract class** → provides a common base with shared state or behavior and can also force subclasses to implement methods.
+
+Use an interface when you only need to define **what a class must provide**.
+
+Use an abstract class when related classes need to **share common implementation or state**.
+
+---
+
+## Multiple Interfaces
+
+A class can implement multiple interfaces:
 
 ```ts
 interface Identifiable {
@@ -609,152 +629,7 @@ class User implements Identifiable, Loggable {
 }
 ```
 
----
-
-# 6. Composition
-
-Composition means building a class using **objects of other classes**.
-
-Instead of saying:
-
-> "A class is another type of class"
-
-composition says:
-
-> "A class contains or uses another object."
-
-### Example
-
-A `Car` has an `Engine`.
-
-```ts
-class Engine {
-	start(): void {
-		console.log("Engine started");
-	}
-}
-
-class Car {
-	constructor(private engine: Engine) {}
-
-	start(): void {
-		this.engine.start();
-		console.log("Car started");
-	}
-}
-
-const engine = new Engine();
-const car = new Car(engine);
-
-car.start();
-```
-
-Here:
-
-```text
-Car
- └── Engine
-```
-
-`Car` does not inherit from `Engine`.
-
-It **contains an Engine object** and uses it.
-
----
-
-## Composition vs Inheritance
-
-### Inheritance
-
-Represents an **is-a** relationship.
-
-```text
-Admin is a User
-```
-
-```ts
-class Admin extends User {}
-```
-
-### Composition
-
-Represents a **has-a** relationship.
-
-```text
-Car has an Engine
-```
-
-```ts
-class Car {
-	constructor(private engine: Engine) {}
-}
-```
-
-Simple rule:
-
-```text
-is-a   → inheritance
-has-a  → composition
-```
-
----
-
-# 7. Method Overloading
-
-Method overloading allows a method to have **multiple call signatures**.
-
-The method can accept different combinations of arguments while providing one implementation.
-
-```ts
-class Calculator {
-	add(a: number, b: number): number;
-	add(a: string, b: string): string;
-
-	add(a: number | string, b: number | string): number | string {
-		if (typeof a === "number" && typeof b === "number") {
-			return a + b;
-		}
-
-		return `${a}${b}`;
-	}
-}
-```
-
-Now the method supports:
-
-```ts
-const calculator = new Calculator();
-
-console.log(calculator.add(10, 20));
-// 30
-
-console.log(calculator.add("Hello ", "World"));
-// Hello World
-```
-
----
-
-## How Method Overloading Works
-
-The overload signatures describe the valid ways to call the method:
-
-```ts
-add(a: number, b: number): number;
-add(a: string, b: string): string;
-```
-
-The implementation signature handles the actual implementation:
-
-```ts
-add(
-  a: number | string,
-  b: number | string
-): number | string {
-  // implementation
-}
-```
-
-The implementation signature itself is not directly visible to callers.
+This allows a class to follow multiple contracts without requiring multiple class inheritance.
 
 ---
 
@@ -766,7 +641,5 @@ The implementation signature itself is not directly visible to callers.
 | Abstraction        | Define required behavior           | `abstract`                   | Base design      |
 | Polymorphism       | Same operation, different behavior | Overriding                   | Shared type      |
 | Interface          | Define a contract                  | `interface`, `implements`    | Contract         |
-| Composition        | Build objects using other objects  | Class properties/constructor | **has-a**        |
-| Method Overloading | Support multiple method signatures | Overload signatures          | Same method name |
 
 ---
